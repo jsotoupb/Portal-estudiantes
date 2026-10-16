@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Portal Académico - Estudiantes</title>
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --text:#2b2b2b; --muted:#5a6672;
+  --blue:#1a5fa4; --blue-dark:#0d3d6e; --border:#d7e0e8;
+  --head-bg:#eaf1f8; --accent:#c0392b;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:#ffffff; color:var(--text);
+  font-family:Arial, Helvetica, sans-serif; font-size:14px;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+header.banner{
+  background:#861f3d; color:#fff; padding:12px 20px;
+  padding-top:calc(12px + env(safe-area-inset-top,0px));
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+}
+.bannerleft{display:flex; align-items:center; gap:10px;}
+.uname{font-size:12.5px; line-height:1.15; font-weight:bold; letter-spacing:.3px;}
+.bannerright button{
+  background:#2a7fc9; color:#fff; border:none; padding:6px 12px; border-radius:4px;
+  font-size:11.5px; margin-left:6px; cursor:default;
+}
+.goldline{height:4px; background:linear-gradient(to right,#c9a227,#ecd58f,#c9a227);}
+.studentbar{text-align:right; font-size:11px; color:#444; padding:4px 20px; background:#fff;}
+.tabs{display:flex; gap:6px; padding:10px 16px 0; flex-wrap:wrap;}
+.tab{
+  background:var(--panel); border:1px solid var(--border); border-bottom:none;
+  padding:8px 16px; border-radius:6px 6px 0 0; color:var(--blue); font-weight:bold; cursor:default;
+}
+.tab.active{background:var(--head-bg);}
+.container{max-width:1000px; margin:0 auto; padding:0 16px 40px;}
+.panel{
+  background:var(--panel); border:1px solid var(--border); border-radius:0 6px 6px 6px;
+  padding:16px; margin-top:0;
+}
+.breadcrumb{font-size:12px; color:var(--muted); margin:14px 0 10px;}
+.breadcrumb a{color:var(--blue); text-decoration:none; cursor:pointer;}
+.breadcrumb a:hover{text-decoration:underline;}
+h1.page-title{font-size:20px; font-weight:400; margin:4px 0 14px; color:var(--text);}
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1px; background:var(--border); border:1px solid var(--border); margin-top:10px;}
+.card{background:var(--panel); padding:14px; cursor:pointer; transition:background .15s;}
+.card:hover{background:var(--head-bg);}
+.card.selected{outline:2px solid var(--blue); outline-offset:-2px;}
+.card .ico{color:var(--accent); font-weight:bold; margin-right:4px;}
+.card .ctitle{color:var(--blue); font-weight:bold; display:block; margin-bottom:4px;}
+.card .ctitle.inactive{color:var(--muted);}
+.card p{margin:0; color:var(--muted); font-size:12.5px;}
+.expand{
+  border:1px solid var(--blue); border-top:none; background:var(--panel);
+  padding:14px 20px; margin-top:-1px; margin-bottom:14px;
+}
+.expand ul{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:8px;}
+.expand li a{color:var(--blue); text-decoration:none; font-size:13px;}
+.expand li a:hover{text-decoration:underline;}
+.expand li.highlight a{font-weight:bold;}
+select, button{
+  font-size:14px; padding:6px 10px; border-radius:4px; border:1px solid var(--border);
+  background:var(--panel); color:var(--text);
+}
+button.send{
+  background:#6b7378; color:#fff; border:none; padding:8px 18px; border-radius:3px; cursor:pointer;
+}
+button.send:hover{background:#565d61;}
+table{border-collapse:collapse; width:100%; margin-top:14px; font-size:13px;}
+th{background:var(--head-bg); text-align:left; padding:8px; border:1px solid var(--border);}
+td{padding:8px; border:1px solid var(--border);}
+a.nrc{color:var(--blue); font-weight:bold; text-decoration:none; cursor:pointer;}
+a.nrc:hover{text-decoration:underline;}
+.info-block{margin-bottom:18px;}
+.info-block h3{font-size:14px; border-bottom:1px solid var(--border); padding-bottom:6px; color:var(--blue);}
+.info-row{display:flex; gap:10px; font-size:13px; margin:4px 0;}
+.info-row .lbl{min-width:170px; font-weight:bold;}
+.linkline{margin-top:16px;}
+.linkline a{display:block; color:var(--blue); text-decoration:none; font-size:13px; margin:4px 0; cursor:pointer;}
+.linkline a:hover{text-decoration:underline;}
+.hidden{display:none;}
+.scrollwrap{overflow-x:auto;}
+.subtabs{display:flex; gap:18px; border-bottom:1px solid var(--border); padding-bottom:6px; font-size:13px; color:var(--muted); flex-wrap:wrap;}
+.subtabs span.active{color:var(--blue); font-weight:bold; border-bottom:2px solid var(--blue); padding-bottom:6px;}
+.schedpanel{border:1px solid var(--border); margin-top:10px;}
+.schedtabs{background:#2b2b2b; color:#fff; display:flex;}
+.schedtabs span{padding:8px 14px; font-size:12.5px; cursor:default;}
+.schedtabs span.active{background:#3d3d3d; font-weight:bold;}
+.schedtitle{padding:8px 14px; font-weight:bold; font-size:13px; border-bottom:1px solid var(--border); background:#fafafa;}
+table.schedtable{width:100%; border-collapse:collapse; font-size:11.5px;}
+table.schedtable th{background:#fafafa; border:1px solid var(--border); padding:6px; font-weight:normal; color:var(--muted);}
+table.schedtable td{border:1px solid var(--border); height:26px; text-align:left; vertical-align:top; padding:4px;}
+td.hr{color:var(--muted); font-size:11px; white-space:nowrap;}
+td.blk{font-size:11px; font-weight:bold; color:#1b1b1b;}
+td.blk.purple{background:#c9b3e0;}
+td.blk.green{background:#aed9a5;}
+td.blk.blue{background:#9cc7ef;}
+td.blk.pink{background:#e597b0;}
+</style>
+</head>
+<body>
+<header class="banner">
+  <div class="bannerleft">
+    <svg width="34" height="34" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M24 4 L42 10 V24 C42 34 34 42 24 44 C14 42 6 34 6 24 V10 Z" stroke="#fff" stroke-width="2" fill="none"/>
+      <rect x="18" y="16" width="12" height="16" fill="none" stroke="#fff" stroke-width="1.3"/>
+      <line x1="24" y1="16" x2="24" y2="32" stroke="#fff" stroke-width="1.3"/>
+      <line x1="18" y1="20" x2="30" y2="20" stroke="#fff" stroke-width="1"/>
+      <line x1="18" y1="24" x2="30" y2="24" stroke="#fff" stroke-width="1"/>
+      <line x1="18" y1="28" x2="30" y2="28" stroke="#fff" stroke-width="1"/>
+    </svg>
+    <div class="uname">Universidad<br>Pontificia<br>Bolivariana</div>
+  </div>
+  <div class="bannerright">
+    <button>🔒 Sign Out</button>
+    <button>❓ Help</button>
+  </div>
+</header>
+<div class="goldline"></div>
+<div class="tabs">
+  <div class="tab">Información Personal</div>
+  <div class="tab">Exalumnos y Amigos</div>
+  <div class="tab active">Estudiantes</div>
+</div>
+<div class="studentbar" id="userinfoHeader">000319881 JUAN P. SOTO FLOREZ<br><span id="clock"></span></div>
+<div class="container">
+<div class="panel" id="app"></div>
+</div>
+
+<script>
+const student = {id:"000319881", name:"JUAN P. SOTO FLOREZ"};
+const now = new Date();
+document.getElementById('clock').textContent = now.toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'}) + ' ' + now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+
+const courses = [
+ {nrc:27001, materia:"5701", curso:"0010", seccion:"01", titulo:"REGULACIÓN EN TI", creditos:"3.000", final:4.3,
+  comps:[["NOTA 1 - Quiz: Normatividad y Cumplimiento",4.0],["NOTA 2 - Taller: Políticas de Seguridad de la Información",4.3],
+         ["NOTA 3 - Examen: Marco Legal y Regulatorio TI",4.5],["NOTA 4 - Debate: Ética y Gobernanza Digital",4.2],
+         ["NOTA 5 - Proyecto: Auditoría de Cumplimiento TI",4.5]]},
+ {nrc:27002, materia:"5712", curso:"0015", seccion:"02", titulo:"CIBERSEGURIDAD EN LA NUBE", creditos:"3.000", final:4.6,
+  comps:[["NOTA 1 - Quiz: Modelos de Responsabilidad Compartida",4.5],["NOTA 2 - Taller: Configuración de Seguridad Cloud",4.7],
+         ["NOTA 3 - Examen: Criptografía y Gestión de Identidades",4.6],["NOTA 4 - Laboratorio: Detección de Amenazas",4.4],
+         ["NOTA 5 - Proyecto: Plan de Respuesta a Incidentes",4.8]]},
+ {nrc:27003, materia:"5720", curso:"0012", seccion:"01", titulo:"INTERNET DE LAS COSAS", creditos:"3.000", final:4.1,
+  comps:[["NOTA 1 - Quiz: Arquitecturas IoT",4.0],["NOTA 2 - Taller: Sensores y Microcontroladores",4.2],
+         ["NOTA 3 - Examen: Protocolos de Comunicación IoT",4.0],["NOTA 4 - Laboratorio: Integración de Dispositivos",4.3],
+         ["NOTA 5 - Proyecto: Prototipo de Solución IoT",4.0]]},
+ {nrc:27004, materia:"5733", curso:"0020", seccion:"03", titulo:"ANALÍTICA DE DATOS", creditos:"3.000", final:4.8,
+  comps:[["NOTA 1 - Quiz: Fundamentos de Analítica",4.7],["NOTA 2 - Taller: Limpieza y Preparación de Datos",4.9],
+         ["NOTA 3 - Examen: Modelos Estadísticos y Predictivos",4.8],["NOTA 4 - Laboratorio: Visualización de Datos",4.9],
+         ["NOTA 5 - Proyecto: Dashboard Analítico Final",4.7]]},
+ {nrc:27005, materia:"5799", curso:"0030", seccion:"01", titulo:"PROYECTO APLICADO EN TI", creditos:"4.000", final:4.4,
+  comps:[["NOTA 1 - Entregable 1: Definición del Proyecto",4.3],["NOTA 2 - Entregable 2: Diseño de la Solución",4.5],
+         ["NOTA 3 - Entregable 3: Desarrollo e Implementación",4.4],["NOTA 4 - Sustentación Parcial",4.3],
+         ["NOTA 5 - Entrega y Sustentación Final",4.5]]}
+];
+
+const app = document.getElementById('app');
+let registroOpen = false;
+
+function go(view, param){
+  if(view==='home') renderHome();
+  else if(view==='periodo') renderPeriodo();
+  else if(view==='resultado') renderResultado(param);
+  else if(view==='detalle') renderDetalle(param);
+  else if(view==='horario') renderHorario();
+}
+
+function renderHome(){
+  registroOpen = false;
+  app.innerHTML = `
+    <div class="breadcrumb">Home &gt; Estudiantes</div>
+    <div class="grid">
+      ${card('Admisión a otros programas académicos','Consulta o diligencia tu solicitud de admisión.')}
+      ${card('Gestión Documentos Digitales de Matrícula - UNIVERSIDAD','Gestiona aquí en forma digital los documentos requeridos para tu proceso de matrícula de pregrado y postgrado.')}
+      ${card('Proceso de matrícula y actualización de datos - Colegio','Gestiona aquí en forma digital los documentos requeridos para formalizar tu proceso de matrícula del colegio y actualización de datos.')}
+      <div class="card" id="cardRegistro" onclick="toggleRegistro()">
+        <span class="ctitle">Registro de cursos y estado de cuenta</span>
+        <p>Inscribe tus cursos, realiza tu matrícula y analiza tu estado de cuenta.</p>
+      </div>
+      ${card('Perfil del Estudiante','Visualiza tu información académica en un solo sitio.')}
+      ${card('Seguimiento a la formación','Analiza, revisa, planea y proyecta tu proceso formativo.')}
+      ${card('Proceso de Titulación','Ejecute paso a paso las actividades para el proceso de Titulación.')}
+      ${card('Evaluación docente','Evalúa tus docentes en línea.')}
+    </div>
+    <div id="expandSlot"></div>
+  `;
+}
+function card(t,d){ return `<div class="card"><span class="ctitle inactive">${t}</span><p>${d}</p></div>`; }
+
+function toggleRegistro(){
+  const slot = document.getElementById('expandSlot');
+  const c = document.getElementById('cardRegistro');
+  if(!registroOpen){
+    c.classList.add('selected');
+    slot.innerHTML = `
+      <div class="expand">
+        <ul>
+          <li><a>Inscribir y eliminar cursos</a></li>
+          <li><a onclick="go('horario')">Horario semanal</a></li>
+          <li><a>Estado de cuenta</a></li>
+          <li class="highlight"><a onclick="go('periodo')">Calificaciones Parciales</a></li>
+          <li><a>Generación de colilla de pago y pago en línea (Pregrado, postgrado, formación continua e idiomas)</a></li>
+          <li><a>Ver retenciones</a></li>
+        </ul>
+      </div>`;
+    registroOpen = true;
+  } else {
+    c.classList.remove('selected');
+    slot.innerHTML = '';
+    registroOpen = false;
+  }
+}
+
+function renderPeriodo(){
+  app.innerHTML = `
+    <div class="breadcrumb"><a onclick="go('home')">Home</a> &gt; <a onclick="go('home')">Estudiantes</a> &gt; Seguimiento a la formación &gt; <b>Calificaciones Parciales UPB</b></div>
+    <h1 class="page-title">Periodo Califs Parciales</h1>
+    <div>
+      <label><b>Seleccionar un Periodo:</b></label><br><br>
+      <select id="periodoSel">
+        <option>2026 semestre 1 - pregrado</option>
+        <option selected>2026 semestre 2 - pregrado</option>
+        <option>2025 semestre 2 - pregrado</option>
+      </select>
+      <br><br>
+      <button class="send" onclick="onEnviar()">Enviar</button>
+    </div>
+    <div class="linkline"><a>Ver Retenciones</a></div>
+  `;
+}
+
+function onEnviar(){
+  const periodo = document.getElementById('periodoSel').value;
+  go('resultado', periodo);
+}
+
+function renderResultado(periodo){
+  const rows = courses.map(c => `
+    <tr>
+      <td><a class="nrc" onclick="go('detalle', ${c.nrc})">${c.nrc}</a></td>
+      <td>${c.materia}</td>
+      <td>${c.curso}</td>
+      <td>${c.seccion}</td>
+      <td>${c.titulo}</td>
+      <td>Medellín - Laureles</td>
+      <td></td>
+      <td>${c.creditos}</td>
+      <td>Pregrado</td>
+    </tr>`).join('');
+  app.innerHTML = `
+    <div class="breadcrumb"><a onclick="go('home')">Home</a> &gt; <b>Calificaciones Parciales</b></div>
+    <h1 class="page-title">Calificaciones Parciales</h1>
+    <div class="info-block">
+      <h3>Información de Alumno</h3>
+      <div class="info-row"><span class="lbl">Programa Actual</span><span>ING DE SISTEMAS E INFORMÁTICA</span></div>
+      <div class="info-row"><span class="lbl">Nivel:</span><span>Pregrado</span></div>
+      <div class="info-row"><span class="lbl">Programa:</span><span>Ing Sistemas e Informática-Med</span></div>
+      <div class="info-row"><span class="lbl">Periodo de Admisión:</span><span>2024 semestre 2 - Pregrado</span></div>
+      <div class="info-row"><span class="lbl">Tipo de Admisión:</span><span>Aspirante por Reintegro</span></div>
+      <div class="info-row"><span class="lbl">Periodo de Catálogo:</span><span>${periodo}</span></div>
+      <div class="info-row"><span class="lbl">Escuela:</span><span>Ingeniería-Med</span></div>
+      <div class="info-row"><span class="lbl">Campus:</span><span>Medellín - Laureles</span></div>
+      <div class="info-row"><span class="lbl">Carrera:</span><span>Ing Sistemas e Informática-Med</span></div>
+    </div>
+    <div class="info-block">
+      <h3>Trabajo de Curso</h3>
+      <div class="scrollwrap">
+      <table>
+        <tr><th>NRC</th><th>Materia</th><th>Curso</th><th>Sección</th><th>Título de Curso</th><th>Campus</th><th>Calificación Parcial</th><th>Créditos</th><th>Nivel</th></tr>
+        ${rows}
+      </table>
+      </div>
+    </div>
+    <div class="linkline"><a onclick="go('periodo')">Selec Otro Periodo</a></div>
+  `;
+}
+
+function renderDetalle(nrc){
+  const c = courses.find(x => x.nrc === nrc);
+  const compRows = c.comps.map(([title,score], idx) => {
+    const isLast = idx === c.comps.length - 1;
+    const scoreCell = isLast ? '' : score.toFixed(2);
+    return `
+    <tr>
+      <td>${title}</td>
+      <td>${scoreCell}</td>
+      <td>${scoreCell}</td>
+      <td>Y</td>
+      <td>20</td>
+      <td>Final</td>
+      <td>Ninguno</td>
+    </tr>`;
+  }).join('');
+  app.innerHTML = `
+    <div class="breadcrumb"><a onclick="go('home')">Home</a> &gt; <b>Detalle de Calificación de Componente</b></div>
+    <h1 class="page-title">Detalle de Calificación de Componente</h1>
+    <div class="info-block">
+      <h3>Atributos de Curso</h3>
+      <div class="info-row"><span class="lbl">NRC:</span><span>${c.nrc}</span></div>
+      <div class="info-row"><span class="lbl">Materia:</span><span>${c.materia}</span></div>
+      <div class="info-row"><span class="lbl">Curso:</span><span>${c.curso}</span></div>
+      <div class="info-row"><span class="lbl">Sección:</span><span>${c.seccion}</span></div>
+      <div class="info-row"><span class="lbl">Título:</span><span>${c.titulo}</span></div>
+      <div class="info-row"><span class="lbl">Créditos:</span><span>${c.creditos}</span></div>
+      <div class="info-row"><span class="lbl">Nivel:</span><span>Pregrado</span></div>
+      <div class="info-row"><span class="lbl">Calificación Parcial:</span><span></span></div>
+      <div class="info-row"><span class="lbl">Calificación Final:</span><span>${c.final.toFixed(2)}</span></div>
+    </div>
+    <div class="info-block">
+      <h3>Componentes</h3>
+      <div class="scrollwrap">
+      <table>
+        <tr><th>Título</th><th>Puntaje</th><th>Calificación</th><th>Debe Aprobar</th><th>Peso</th><th>Incluir en Parcial o Final</th><th>Subcomponentes</th></tr>
+        ${compRows}
+      </table>
+      </div>
+    </div>
+    <div class="linkline">
+      <a onclick="go('resultado','2026 semestre 2 - pregrado')">Regresar a Anterior</a>
+      <a onclick="go('resultado','2026 semestre 2 - pregrado')">Selec Otro NRC</a>
+    </div>
+  `;
+}
+
+function renderHorario(){
+  app.innerHTML = `
+    <div class="breadcrumb">Student &gt; Registration &gt; Select a Term &gt; <b>Register for Classes</b></div>
+    <h1 class="page-title">Register for Classes</h1>
+    <div class="subtabs">
+      <span>Find Classes</span><span class="active">Enter CRNs</span><span>Plans</span><span>Projections</span><span>Schedule and Options</span>
+    </div>
+    <p style="font-size:13px; margin:14px 0;"><b>Enter Course Reference Numbers (CRNs) to Register</b></p>
+    <div class="schedpanel">
+      <div class="schedtabs"><span class="active">📅 Schedule</span><span>📋 Schedule Details</span></div>
+      <div class="schedtitle">Class Schedule for 2026 semestre 2 - pregrado</div>
+      <div class="scrollwrap">
+      <table class="schedtable">
+        <tr><th></th><th>Sunday</th><th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th><th>Saturday</th></tr>
+        <tr><td class="hr">7am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr>
+          <td class="hr">8am</td><td></td>
+          <td class="blk purple" rowspan="2">✓ REGULACIÓN EN TI</td>
+          <td class="blk purple" rowspan="2">✓ ANALÍTICA DE DATOS</td>
+          <td class="blk purple" rowspan="2">✓ REGULACIÓN EN TI</td>
+          <td></td>
+          <td class="blk pink" rowspan="2">✓ PROYECTO APLICADO EN TI</td>
+          <td></td>
+        </tr>
+        <tr><td class="hr">9am</td><td></td><td></td><td></td></tr>
+        <tr>
+          <td class="hr">10am</td><td></td>
+          <td class="blk green" rowspan="2">✓ CIBERSEGURIDAD EN LA...</td>
+          <td class="blk green" rowspan="2">✓ ANALÍTICA DE DATOS</td>
+          <td class="blk green" rowspan="2">✓ CIBERSEGURIDAD EN LA...</td>
+          <td></td>
+          <td class="blk pink" rowspan="2">✓ PROYECTO APLICADO EN TI</td>
+          <td></td>
+        </tr>
+        <tr><td class="hr">11am</td><td></td><td></td><td></td></tr>
+        <tr>
+          <td class="hr">12pm</td><td></td>
+          <td class="blk blue" rowspan="2">✓ INTERNET DE LAS COSAS</td>
+          <td></td>
+          <td class="blk blue" rowspan="2">✓ INTERNET DE LAS COSAS</td>
+          <td></td><td></td><td></td>
+        </tr>
+        <tr><td class="hr">1pm</td><td></td><td></td><td></td><td></td><td></td></tr>
+      </table>
+      </div>
+    </div>
+  `;
+}
+
+renderHome();
+</script>
+</body>
+</html>
